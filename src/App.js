@@ -1,20 +1,40 @@
+import React, { useEffect, useState } from "react";
 import "./App.css";
-import Video from "./pages/Video"
+import Video from "./pages/Video";
+import db from "./config/firebase";
+import { collection, getDocs } from "firebase/firestore/lite";
 
 function App() {
+  const [video, setVideos] = useState([]);
+
+  async function getVideos() {
+    const videosCollection = collection(db, "videos");
+    const videosSnapshot = await getDocs(videosCollection);
+    const videosList = videosSnapshot.docs.map((doc) => doc.data());
+    setVideos(videosList);
+  }
+
+  useEffect(() => {
+    getVideos();
+  }, []);
+
   return (
     <div className="App">
       <div className="app__videos">
-        <Video 
-          likes={111}
-          messages={222}
-          shares={333}
-          name= "Paulo"
-          description= "Brecker o goleiro"
-          music= "musica épica"
-          url="https://firebasestorage.googleapis.com/v0/b/jornadadevtr.appspot.com/o/WhatsApp%20Video%202023-03-29%20at%2020.04.52.mp4?alt=media&token=db4be029-27cc-4af9-b75d-3ce5fd1b1fe2"
-        />
-        <Video 
+        {video.map((item) => {
+          return (
+            <Video
+              likes={item.likes}
+              messages={item.messages}
+              shares={item.shares}
+              name={item.name}
+              description={item.description}
+              music={item.music}
+              url={item.url}
+            />
+          );
+        })}
+        {/* <Video 
           likes={444}
           messages={555}
           shares={666}
@@ -22,7 +42,7 @@ function App() {
           description= "Bird olhando para a camera"
           music= "Clap your hands"
           url="https://poqlymuephttfsljdabn.supabase.co/storage/v1/object/public/jornadadev/bird.mp4"
-        />
+        /> */}
       </div>
     </div>
   );
